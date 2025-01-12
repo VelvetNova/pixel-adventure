@@ -39,12 +39,8 @@ jobs:
 
     - name: 构建可执行文件
       run: |
-        if [[ "$RUNNER_OS" == "Windows" ]]; then
-          mkdir build
-          mkdir dist
-        else
-          mkdir -p build dist
-        fi
+        mkdir build
+        mkdir dist
         pyinstaller --onefile main.py
 
     - name: 上传构建工件
