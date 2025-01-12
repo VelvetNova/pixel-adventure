@@ -21,10 +21,13 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: 创建缓存目录
+      run: mkdir -p .cache
+
     - name: 缓存依赖
       uses: actions/cache@v4
       with:
-        path: ~/.cache/pip
+        path: .cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
@@ -36,7 +39,12 @@ jobs:
 
     - name: 构建可执行文件
       run: |
-        mkdir -p build dist
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          mkdir build
+          mkdir dist
+        else
+          mkdir -p build dist
+        fi
         pyinstaller --onefile main.py
 
     - name: 上传构建工件
