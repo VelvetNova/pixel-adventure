@@ -36,13 +36,8 @@ jobs:
 
     - name: 构建可执行文件
       run: |
-        # 确保 build 和 dist 文件夹存在
         mkdir -p build dist
         pyinstaller --onefile main.py
-      shell: bash
-      env:
-        pythonLocation: /Users/runner/hostedtoolcache/Python/3.13.1/arm64
-        PATH: /Users/runner/hostedtoolcache/Python/3.13.1/arm64/bin:/Users/runner/hostedtoolcache/Python/3.13.1/arm64/Scripts
 
     - name: 上传构建工件
       uses: actions/upload-artifact@v4
