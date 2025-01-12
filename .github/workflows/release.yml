@@ -60,14 +60,14 @@ jobs:
     
     - name: 设置 Git 凭证
       run: |
-        git config user.name qfwuecrk
-        git config user.email a6vAcNmfWh@outlook.com
+        git config user.name github-actions[bot]
+        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
     - name: 创建标签
       id: create_tag
       run: |
-        git tag -a v${{ github.ref_name }} -m "Release v${{ github.ref_name }}"
-        git push origin v${{ github.ref_name }}
+        git tag -a ${{ github.ref_name }} -m "Release ${{ github.ref_name }}"
+        git push origin ${{ github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
