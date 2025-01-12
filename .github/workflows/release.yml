@@ -39,6 +39,7 @@ jobs:
         # 确保 build 和 dist 文件夹存在
         mkdir -p build dist
         pyinstaller --onefile main.py
+      shell: /bin/bash
       env:
         PATH: ${{ runner.tool_cache }}/Python/3.x.x/bin:${{ runner.tool_cache }}/Python/3.x.x/Scripts:${{ env.PATH }}
 
