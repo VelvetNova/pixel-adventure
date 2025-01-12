@@ -57,6 +57,11 @@ jobs:
     steps:
     - name: 检出代码
       uses: actions/checkout@v2
+    
+    - name: 设置 Git 凭证
+      run: |
+        git config user.name github-actions[bot]
+        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
     - name: 创建标签
       id: create_tag
