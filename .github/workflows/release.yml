@@ -1,0 +1,93 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v2
+
+    - name: 设置 Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: 缓存依赖
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 构建可执行文件
+      run: |
+        # 确保 build 和 dist 文件夹存在
+        mkdir -p build dist
+        pyinstaller --onefile main.py
+      env:
+        PATH: ${{ runner.tool_cache }}/Python/3.x.x/bin:${{ runner.tool_cache }}/Python/3.x.x/Scripts:${{ env.PATH }}
+
+    - name: 上传构建工件
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-${{ matrix.os }}
+        path: |
+          build/
+          dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v2
+
+    - name: 创建标签
+      id: create_tag
+      run: |
+        git tag -a v${{ github.ref_name }} -m "Release v${{ github.ref_name }}"
+        git push origin v${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 下载构建工件
+      uses: actions/download-artifact@v2
+      with:
+        name: build-ubuntu-latest
+        path: build
+
+    - name: 创建发布
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.ref_name }}
+        release_name: 发布 v${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    - name: 上传发布资源
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/dist/main
+        asset_name: main-ubuntu-latest.zip
+        asset_content_type: application/zip
