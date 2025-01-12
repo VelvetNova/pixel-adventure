@@ -63,14 +63,6 @@ jobs:
         git config user.name github-actions[bot]
         git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-    - name: 创建标签
-      id: create_tag
-      run: |
-        git tag -a ${{ github.ref_name }} -m "Release ${{ github.ref_name }}"
-        git push origin ${{ github.ref_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: 下载构建工件
       uses: actions/download-artifact@v4
       with:
