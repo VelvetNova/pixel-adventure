@@ -82,7 +82,7 @@ jobs:
 
     - name: Test
       run: |
-        ls
+        ls build
 
     - name: 上传发布资源
       uses: actions/upload-release-asset@v1
